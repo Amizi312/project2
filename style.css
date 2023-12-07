@@ -1,0 +1,42 @@
+#sections{
+    display: flex;
+    justify-content: center;
+    justify-content: space-evenly; 
+    padding: 10px 0;
+    background-color: rgba(9, 169, 223, 0.2);
+}
+
+h1{
+    text-align: center;
+    color: #3e9c35;
+}
+
+label{
+    font-weight: bold;
+}
+
+a{
+    text-decoration: none;
+}
+
+img {
+    width: 50px;
+    height: 50px;
+}
+
+body{
+    background-image: url("assets/bodyBG.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: fixed;
+    }
+
+.card{
+    color: #3e9c35;
+    font-weight: bold;
+    background-color: transparent;
+    width: 150px;
+    /* margin-bottom: 10px; */
+    border: 1px double black;
+}
+
