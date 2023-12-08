@@ -45,7 +45,6 @@ $(()=>{
         for(const coin of coins) {
             const card = createCard(coin)
             content += card
-            console.log(content)
         }
         $("#homeSection").html(content)
     }
@@ -68,22 +67,14 @@ $(()=>{
         const coin = await getMoreInfo(coinId)
         const infoDiv = document.getElementById(`${coinId}Info`)
         const content = `
-        ${coin.market_data.current_price.usd} <br>
-        ${coin.market_data.current_price.eur} <br>
-        ${coin.market_data.current_price.ils} <br>`        
+        ${coin.market_data.current_price.usd}$<br>
+        ${coin.market_data.current_price.eur}€<br>
+        ${coin.market_data.current_price.ils}₪<br>`        
         if(infoDiv.style.display!=="block")
             {infoDiv.innerHTML = content
                 infoDiv.style.display="block"}
         else if(infoDiv.style.display==="block")
                 $(infoDiv).hide(1000)
-        
-        // $(this).next().html(content)
-        // if(infoDiv.style.display!=="block")
-        //     {$(infoDiv).show(1000)
-        //         
-        //     }
-        // if(infoDiv.style.display!=="none")
-        // $(infoDiv).hide(1000)
     })
     
     async function getMoreInfo(coinId) {
