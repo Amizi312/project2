@@ -61,28 +61,31 @@ $(()=>{
         </div>`
         return card
     }
+    
 
     $("#homeSection").on("click",".card > button", async function () {
         const coinId = $(this).attr("id") 
-        console.log(coinId)
-        const coin = await getMoreInfo(coinId) 
+        const coin = await getMoreInfo(coinId)
+        const infoDiv = document.getElementById(`${coinId}Info`)
         const content = `
         ${coin.market_data.current_price.usd} <br>
         ${coin.market_data.current_price.eur} <br>
         ${coin.market_data.current_price.ils} <br>`        
-        $(this).next().html(content)
-        showAndHide(coin)
+        if(infoDiv.style.display!=="block")
+            {infoDiv.innerHTML = content
+                infoDiv.style.display="block"}
+        else if(infoDiv.style.display==="block")
+                $(infoDiv).hide(1000)
+        
+        // $(this).next().html(content)
+        // if(infoDiv.style.display!=="block")
+        //     {$(infoDiv).show(1000)
+        //         
+        //     }
+        // if(infoDiv.style.display!=="none")
+        // $(infoDiv).hide(1000)
     })
-
-function showAndHide(coin){
-    let showAndHide = document.getElementById(`${coin.id}Info`);
-        if (showAndHide.style.display === "none") {
-            showAndHide.style.display = "block"
-        }
-        else {
-            showAndHide.style.display = "none"
-        }
-}
+    
     async function getMoreInfo(coinId) {
         const coin = await getJSON(`https://api.coingecko.com/api/v3/coins/${coinId}`)
         return coin
