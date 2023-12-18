@@ -60,23 +60,61 @@ $(()=>{
         </div>`
         return card
     }
-    
+    let clickCount = 0;
+    let firstClickTime = null;
+
+function checkTime(){
+    let currentTime = new Date().getTime();
+    if (clickCount === 0){
+        firstClickTime = currentTime
+        return 0
+        }
+    if (clickCount === 2) {
+        const timeDiff = currentTime - firstClickTime;
+        return timeDiff}
+    // Increment click count for the next click
+    clickCount = (clickCount + 1) % 3
+}
+    function StoreCoinInfo(coin){
+        coinInfo = {
+        usd : coin.market_data.current_price.usd,
+        eur :coin.market_data.current_price.eur,
+        ils : coin.market_data.current_price.ils
+        }
+        sessionStorage.setItem(`coinInfo${coin.id}`,JSON.stringify(coinInfo))
+    }
 
     $("#homeSection").on("click",".card > button", async function () {
         const coinId = $(this).attr("id") 
-        const coin = await getMoreInfo(coinId)
         const infoDiv = document.getElementById(`${coinId}Info`)
-        const content = `
-        ${coin.market_data.current_price.usd}$<br>
-        ${coin.market_data.current_price.eur}€<br>
-        ${coin.market_data.current_price.ils}₪<br>`        
-        if(infoDiv.style.display!=="block")
+        if (checkTime()>12000 || checkTime()===0)
+        {
+            const coin = await getMoreInfo(coinId)
+            const content = `
+            ${coin.market_data.current_price.usd}$<br>
+            ${coin.market_data.current_price.eur}€<br>
+            ${coin.market_data.current_price.ils}₪<br>`        
+            StoreCoinInfo(coin)
+            if(infoDiv.style.display!=="block")
             {infoDiv.innerHTML = content
                 infoDiv.style.display="block"}
         else if(infoDiv.style.display==="block")
-                $(infoDiv).hide(1000)
+                $(infoDiv).hide(1000)}
+        else
+            {
+            storedData = sessionStorage.getItem(`coinInfo${coinId}`)
+            const coinInfo = JSON.parse(storedData)
+            const content = `
+            ${coinInfo.usd}$<br>
+            ${coinInfo.eur}€<br>
+            ${coinInfo.ils}₪<br>` 
+            if(infoDiv.style.display!=="block")
+            {infoDiv.innerHTML = content
+                infoDiv.style.display="block"}
+        else if(infoDiv.style.display==="block")
+                $(infoDiv).hide(1000)}
     })
-    
+
     async function getMoreInfo(coinId) {
         const coin = await getJSON(`https://api.coingecko.com/api/v3/coins/${coinId}`)
         return coin
