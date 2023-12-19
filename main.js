@@ -1,6 +1,6 @@
 /// <reference path="jquery-3.6.2.js" />
 
-$(()=>{
+$(() => {
 
     let coins = []
     handleCoins()
@@ -8,11 +8,11 @@ $(()=>{
     $("section").hide()
     $("#homeSection").show()
 
-    $("a").on("click", function() {
+    $("a").on("click", function () {
         const dataSection = $(this).attr("data-section")
         console.log(dataSection)
         $("section").hide()
-        $("#"+dataSection).show()
+        $("#" + dataSection).show()
     })
 
     async function handleCoins() {
@@ -26,7 +26,7 @@ $(()=>{
     }
 
     function getJSON(url) {
-        return new Promise((resolve,reject)=>{
+        return new Promise((resolve, reject) => {
             $.ajax({
                 url,
                 success: data => {
@@ -42,7 +42,7 @@ $(()=>{
 
     function displayCoins(coins) {
         let content = ""
-        for(const coin of coins) {
+        for (const coin of coins) {
             const card = createCard(coin)
             content += card
         }
@@ -60,74 +60,73 @@ $(()=>{
         </div>`
         return card
     }
-    let clickCount = 0;
-    let firstClickTime = null;
 
-function checkTime(){
-    let currentTime = new Date().getTime();
-    if (clickCount === 0){
-        firstClickTime = currentTime
-        return 0
-        }
-    if (clickCount === 2) {
-        const timeDiff = currentTime - firstClickTime;
-        return timeDiff}
-    // Increment click count for the next click
-    clickCount = (clickCount + 1) % 3
-}
-    function StoreCoinInfo(coin){
+    function StoreCoinInfo(coin) {
+        const time = new Date().getTime()
         coinInfo = {
-        usd : coin.market_data.current_price.usd,
-        eur :coin.market_data.current_price.eur,
-        ils : coin.market_data.current_price.ils
+            usd: coin.market_data.current_price.usd,
+            eur: coin.market_data.current_price.eur,
+            ils: coin.market_data.current_price.ils,
+            time: time
         }
-        sessionStorage.setItem(`coinInfo${coin.id}`,JSON.stringify(coinInfo))
+        const json = JSON.stringify(coinInfo)
+        sessionStorage.setItem(`coinInfo${coin.id}`, json)
+        console.log(json)
     }
-
-    $("#homeSection").on("click",".card > button", async function () {
-        const coinId = $(this).attr("id") 
+    
+    function timeCheck(coin){
+        const nowTime = new Date().getTime()
+        restCoin = JSON.parse(sessionStorage.getItem(`coinInfo${coin}`))
+        restCoin = parseInt(restCoin.time)
+        console.log(restCoin, typeof(restCoin))
+            if ((nowTime - restCoin) > 120000)
+            sessionStorage.removeItem(`coinInfo${coin}`)
+    }
+    $("#homeSection").on("click", ".card > button", async function () {
+        const coinId = $(this).attr("id")
         const infoDiv = document.getElementById(`${coinId}Info`)
-        if (checkTime()>12000 || checkTime()===0)
-        {
+        if (sessionStorage.getItem(`coinInfo${coinId}`)===null) {
             const coin = await getMoreInfo(coinId)
             const content = `
             ${coin.market_data.current_price.usd}$<br>
             ${coin.market_data.current_price.eur}€<br>
-            ${coin.market_data.current_price.ils}₪<br>`        
+            ${coin.market_data.current_price.ils}₪<br>`
             StoreCoinInfo(coin)
-            if(infoDiv.style.display!=="block")
-            {infoDiv.innerHTML = content
-                infoDiv.style.display="block"}
-        else if(infoDiv.style.display==="block")
-                $(infoDiv).hide(1000)}
-        else
-            {
-            storedData = sessionStorage.getItem(`coinInfo${coinId}`)
+            displayAndHide(infoDiv, content)
+        }
+        else {
+            const storedData = sessionStorage.getItem(`coinInfo${coinId}`)
             const coinInfo = JSON.parse(storedData)
+            console.log(coinInfo)
             const content = `
             ${coinInfo.usd}$<br>
             ${coinInfo.eur}€<br>
-            ${coinInfo.ils}₪<br>` 
-            if(infoDiv.style.display!=="block")
-            {infoDiv.innerHTML = content
-                infoDiv.style.display="block"}
-        else if(infoDiv.style.display==="block")
-                $(infoDiv).hide(1000)}
+            ${coinInfo.ils}₪<br>`
+            displayAndHide(infoDiv, content)
+        }
+        timeCheck(coinId)
     })
-
+    function displayAndHide(infoDiv, content) {
+        if (infoDiv.style.display !== "block") {
+            infoDiv.innerHTML = content
+            infoDiv.style.display = "block"
+        }
+        else if (infoDiv.style.display === "block")
+            $(infoDiv).hide(1000)
+    }
     async function getMoreInfo(coinId) {
         const coin = await getJSON(`https://api.coingecko.com/api/v3/coins/${coinId}`)
         return coin
     }
 
-    $("input[type=search]").on("keyup",function(){
+    $("input[type=search]").on("keyup", function () {
         const textToSearch = $(this).val().toLowerCase()
-        if(textToSearch === "") {
+        if (textToSearch === "") {
             displayCoins(coins)
         }
         else {
             const filteredCoins = coins?.filter(coin => coin.symbol.includes(textToSearch))
             displayCoins(filteredCoins)
         }
-    })  
+    })
 })
