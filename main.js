@@ -1,24 +1,19 @@
 /// <reference path="jquery-3.6.2.js" />
 
 $(() => {
-
     let coins = []
     handleCoins()
-
     $("section").hide()
     $("#homeSection").show()
-
     $("a").on("click", function () {
         const dataSection = $(this).attr("data-section")
-        console.log(dataSection)
         $("section").hide()
         $("#" + dataSection).show()
     })
-
+    
     async function handleCoins() {
         try {
             coins = await getJSON("https://api.coingecko.com/api/v3/coins/")
-            console.log(coins)
             displayCoins(coins)
         } catch (error) {
             alert(error.message)
@@ -36,10 +31,24 @@ $(() => {
                     reject(err)
                 }
             })
-
         })
     }
-
+        let followingCoins = 0
+           $("#homeSection").on("click",".card > .following", function (){
+            if (this.value==="notClicked"){
+                if (followingCoins<5){
+                this.innerHTML= "🤑"
+                followingCoins++
+                this.value="clicked"
+                alert(`You have ${5-followingCoins} coins left to follow.`)}
+                else if (followingCoins===5)
+                    alert("You are following 5 coins. To change coins, please remove one or more coins subs.")}
+            else if (this.value==="clicked"){
+                this.innerHTML= "🙂"
+                followingCoins--
+                alert(`You have ${5-followingCoins} coins left to follow.`)}
+        })
+    
     function displayCoins(coins) {
         let content = ""
         for (const coin of coins) {
@@ -55,8 +64,9 @@ $(() => {
             <span>${coin.id}</span><br>
             <span>${coin.symbol}</span><br>
             <img src="${coin.image.small}"/><br>
-            <button class="btn btn-info" id="${coin.id}">More Info</button>
+            <button class="showCoin btn btn-info" id="${coin.id}">More Info</button>
             <div class="coinInfo" id="${coin.id}Info"></div>
+            <button class="following" value="notClicked">🙂</button>
         </div>`
         return card
     }
@@ -71,18 +81,16 @@ $(() => {
         }
         const json = JSON.stringify(coinInfo)
         sessionStorage.setItem(`coinInfo${coin.id}`, json)
-        console.log(json)
     }
     
     function timeCheck(coin){
         const nowTime = new Date().getTime()
         restCoin = JSON.parse(sessionStorage.getItem(`coinInfo${coin}`))
         restCoin = parseInt(restCoin.time)
-        console.log(restCoin, typeof(restCoin))
-            if ((nowTime - restCoin) > 120000)
-            sessionStorage.removeItem(`coinInfo${coin}`)
+        if ((nowTime - restCoin) > 120000)
+        sessionStorage.removeItem(`coinInfo${coin}`)
     }
-    $("#homeSection").on("click", ".card > button", async function () {
+    $("#homeSection").on("click", ".card > .showCoin", async function () {
         const coinId = $(this).attr("id")
         const infoDiv = document.getElementById(`${coinId}Info`)
         if (sessionStorage.getItem(`coinInfo${coinId}`)===null) {
@@ -97,7 +105,6 @@ $(() => {
         else {
             const storedData = sessionStorage.getItem(`coinInfo${coinId}`)
             const coinInfo = JSON.parse(storedData)
-            console.log(coinInfo)
             const content = `
             ${coinInfo.usd}$<br>
             ${coinInfo.eur}€<br>
@@ -130,3 +137,4 @@ $(() => {
         }
     })
 })
+

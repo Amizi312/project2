@@ -44,6 +44,12 @@ body {
     background-size: cover;
     }
 
+.following{
+    border: none;
+    background-color: transparent;
+    outline: none;
+    width: 50px;
+    height: 50px;}
 .card{
     color: #3e9c35;
     font-weight: bold;
