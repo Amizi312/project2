@@ -1,123 +1,168 @@
-#sections{
-    display: flex;
-    justify-content: center;
-    justify-content: space-evenly; 
-    padding: 10px 0;
-    background-color: rgba(9, 169, 223, 0.2);
+#sections {
+  display: flex;
+  justify-content: center;
+  justify-content: space-evenly;
+  padding: 10px 0;
+  background-color: rgba(9, 169, 223, 0.2);
 }
 
-#homeSection{
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex-grow: 20%;
-    justify-content: space-between;
+#homeSection {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-grow: 20%;
+  justify-content: center;
 }
 
-h1{
-    text-align: center;
-    color: #3e9c35;
+h1 {
+  text-align: center;
+  color: #3e9c35;
 }
 
-label{
-    font-weight: bold;
+label {
+  font-weight: bold;
 }
 
-a{
-    text-decoration: none;
+a {
+  text-decoration: none;
 }
 
 img {
-    width: 50px;
-    height: 50px;
-    align-self: center;
-}
-button{
-    width: fit-content !important;
-    align-self: center;
+  width: 50px;
+  height: 50px;
+  align-self: center;
 }
 
-body { 
-    background: url("assets/bodyBG.jpg") no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    }
-
-#closePopup{
-    font-size: medium;
-    background-color: bisque;
-    color: black;
-    position: absolute;
-    left: 5px;
-    top: 5px;
-}    
-.following{
-    border: none;
-    background-color: transparent;
-    outline: none;
-    width: 50px;
-    height: 50px;
-} 
-.card{
-    color: #3e9c35;
-    font-weight: bold;
-    background-color: transparent;
-    width: 120px;
-    height: 230px;
-    border: 1px double black;
-    border-radius: 25px;
-    padding-bottom: auto;
-    margin: 5px 5px;
-    text-align: center;
-    justify-content: center;
+button {
+  width: fit-content !important;
+  align-self: center;
 }
 
-.popup {
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  .popup .popuptext {
-    flex-wrap: wrap;
-    display: inline-flex;
-    flex-direction: row;
-    visibility: hidden;
-    width: 75%;
-    height: 15%;
-    background-color: rgba(185, 185, 185, 0.8);
-    color: #130a9b;
-    text-align: center;
-    border-radius: 10px;
-    padding: 5px 5px;
-    z-index: 1;
-    position: absolute;
-    margin: 0 20% 0 20%;
-  }
-  .popuptext > #popupStart{
-    position: absolute;
-    top: 5px;
-    left: 25%;
-  }
-  .popuptext > #popupEnd{
-    position: absolute;
-    bottom: 5px;
-    left: 25%;}
+body {
+  background: url("assets/bodyBG.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
 
-  .popup .show {
-    visibility: visible;
-    -webkit-animation: fadeIn 1s;
-    animation: fadeIn 1s;
-  }
+#closePopup {
+  font-size: medium;
+  background-color: bisque;
+  color: black;
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+
+.following {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  width: 50px;
+  height: 50px;
+}
+#popupCoins .card{
+  width: 20%;
+  height: 60%;
+}
+
+.card {
+  position: relative;
+  color: #3e9c35;
+  font-weight: bold;
+  background-color: transparent;
+  width: 120px;
+  height: 230px;
+  border: 1px double black;
+  border-radius: 25px;
+  padding-bottom: auto;
+  margin: 5px 5px;
+  text-align: center;
+  justify-content: center;
+  justify-content: space-evenly;
+}
+
+.popupContainer {
+  position: absolute;
+  cursor: pointer;
+  left: 0%;
+  width: 90%;
+  user-select: none;
+  flex-direction: column;
+  flex-flow: wrap;
+  height: 80%;
+}
+
+#popupCoins {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-grow: 20%;
+  justify-content: center;
+}
+
+#myPopup {
   
-  @-webkit-keyframes fadeIn {
-    from {opacity: 0;} 
-    to {opacity: 1;}
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin: 10px;
+  padding: 5px;
+  height: 90%;
+  left: 10%;
+  right: 10%;
+}
+
+p {
+  height: fit-content;
+}
+
+.popupContainer>.popupText {
+  display: flex;
+  visibility: hidden;
+  left: 20%;
+  height: 50%;
+  background-color: rgba(185, 185, 185, 1);
+  color: #130a9b;
+  text-align: center;
+  border-radius: 10px;
+  padding: 5px 5px;
+  z-index: 1;
+  position: absolute;
+  margin: 0 20% 0 20%;
+}
+
+.popupText {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 80%;
+  height: 20%;
+}
+
+.popupContainer .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity:1 ;}
-  } 
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

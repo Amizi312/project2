@@ -1,34 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="icon" type="image/x-icon" href="assets/favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto-Project</title>
     <script src="jquery-3.6.2.js"></script>
-    <script defer src="main.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script defer src="main2.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1>Cryptc🤑in$ Pr🤑ject</h1>
-  </div>
-      </div> 
+    </div>
+    </div>
     <div id="sections">
         <a href="javascript:void(0)" data-section="homeSection">Home</a>
         <a href="javascript:void(0)" data-section="reportSection">Live Report</a>
         <a href="javascript:void(0)" data-section="aboutSection">About Us</a>
         <div>
-        <label>$earch Coin:</label>
-        <input type="search" placeholder="btc, ethereum..." onload="reset()">
+            <label>$earch Coin:</label>
+            <input type="search" placeholder="btc, ethereum..." onload="reset()">
         </div>
     </div>
-    <div class="popup">
-        <span class="popuptext" id="myPopup"></span>
+    <div class="popupContainer" >
+        <div class="popupText" id="myPopup">
+            <button id="closePopup">X</button>
+            <p id="startText">You can choose up to 5 coins to follow:</p>
+            <div id="popupCoins"></div>
+            <p id="endText">please replace with another coin.</p>
+        </div>
+    </div>
     <div id="container">
-    <section id="homeSection"></section>
-    <section id="reportSection"></section>
-    <section id="aboutSection"></section>
-</div>
+        <section id="homeSection"></section>
+        <section id="reportSection"></section>
+        <section id="aboutSection"></section>
+    </div>
 </body>
+
 </html>
