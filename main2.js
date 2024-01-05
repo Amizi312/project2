@@ -1,17 +1,19 @@
 /// <reference path="jquery-3.6.2.js" />
-const callAPI = "assets/cryptoAPI.json" // "https://api.coingecko.com/api/v3/coins/"
-// const liveCoin = `https://min-api.cryptocompare.com/data/price?fsym=${coin.symbol}&tsyms=USD`
+const callAPI = "assets/cryptoAPI100.json" // "https://api.coingecko.com/api/v3/coins/"
+// const liveCoin = "https://min-api.cryptocompare.com/data/price?fsym="+coin.symbol+"&tsyms=USD"
 $(() => {
     let coins = []
     // Hide and show sections
     handleCoins()
     $("section").hide()
     $("#homeSection").show()
+    // moving between sections
     $("a").on("click", function () {
         const dataSection = $(this).attr("data-section")
         $("section").hide()
         $("#" + dataSection).show()
-    })
+    }
+    )
     // getting coins' details and sending to display.
     async function handleCoins() {
         try {
@@ -42,12 +44,10 @@ $(() => {
     let favCoins = []
     $("#homeSection").on("click", ".following", function () {
         const popup = document.getElementById("myPopup")
-        if (followingCoins<=5)
-        {
+        if (followingCoins <= 5) {
             if (this.textContent === `🙂`) { addFavCoin(this) }
             else if (this.textContent === `🤑`) { removeFavCoin(this) }
-            if (followingCoins === 6)
-            {
+            if (followingCoins === 6) {
                 popup.classList.toggle("show")
                 displayCoins(("popupCoins"), favCoins)
             }
@@ -74,11 +74,10 @@ $(() => {
     $("#myPopup").on("click", ".card", function () {
         const popup = document.getElementById("myPopup")
         followingCoins--
-    for (const coin of favCoins)
-        if ((this.innerHTML).includes(coin.id))
-            {
-                favCoins.splice(favCoins.indexOf(coin), 1)  
-                document.getElementById(`follow${coin.id}`).textContent=`🙂`
+        for (const coin of favCoins)
+            if ((this.innerHTML).includes(coin.id)) {
+                favCoins.splice(favCoins.indexOf(coin), 1)
+                document.getElementById(`follow${coin.id}`).textContent = `🙂`
             }
         popup.classList.toggle("show")
     }
@@ -90,16 +89,28 @@ $(() => {
                 return coins[i]
         }
     }
+
     // closing popup button
     $("#myPopup").on("click", "#closePopup", function () {
         const popup = document.getElementById("myPopup")
         followingCoins--
-        document.getElementById(`follow${favCoins[favCoins.length-1].id}`).textContent=`🙂`
+        document.getElementById(`follow${favCoins[favCoins.length - 1].id}`).textContent = `🙂`
         favCoins.pop()
         popup.classList.toggle("show")
-        console.log(favCoins)
     }
     )
+    
+    // scrolling with the popup
+    window.onscroll = function() {
+        const box = document.getElementById("myPopup")
+        let scroll = window.pageYOffset
+      
+        if (scroll < 30) {
+            box.style.top = "30px"
+        } else {
+            box.style.top = (scroll + 2) + "px"
+        }
+      }
     // "Printing" coins to screen
     function displayCoins(displayArea, coins) {
         let card
@@ -110,7 +121,7 @@ $(() => {
             else {
                 card = `<div class="card">
                     <span>${coin.id}</span><br>
-                    <img src="${coin.image.small}"/><br>
+                    <img src="${coin.image}"/><br>
                     </div>`
             }
             content += card
@@ -123,7 +134,7 @@ $(() => {
         <div class="card">
             <span>${coin.id}</span><br>
             <span>${coin.symbol}</span><br>
-            <img src="${coin.image.small}"/><br>
+            <img src="${coin.image}"/><br>
             <button class="showCoin btn btn-info" id="${coin.id}">More Info</button>
             <div class="coinInfo" id="${coin.id}Info"></div>
             <button class="following" id="follow${coin.id}">🙂</button>
@@ -175,6 +186,11 @@ $(() => {
         timeCheck(coinId)
     }
     )
+    // fetching "more Info" data
+    async function getMoreInfo(coinId) {
+        const coin = await getJSON("https://api.coingecko.com/api/v3/coins/" + coinId)
+        return coin
+    }
     // Open and close "more Info"
     function displayAndHide(infoDiv, content) {
         if (infoDiv.style.display !== "block") {
@@ -183,11 +199,6 @@ $(() => {
         }
         else if (infoDiv.style.display === "block")
             $(infoDiv).hide(1000)
-    }
-    // fetching "more Info" data
-    async function getMoreInfo(coinId) {
-        const coin = await getJSON("https://api.coingecko.com/api/v3/coins/" + coinId)
-        return coin
     }
     // live coins search
     $("input[type=search]").on("keyup", function () {
@@ -200,5 +211,104 @@ $(() => {
         }
     }
     )
-})
-
+    const updateInterval = setInterval(grpahDisplay, 3000)
+    async function getCoinRate(coin)
+            {
+                const resp = await fetch("https://min-api.cryptocompare.com/data/price?fsym="+coin+"&tsyms=USD")
+                const coinRate = await resp.json()
+                const answer = coinRate.USD
+                // console.log(answer)            
+                return (answer)
+            }
+    function grpahDisplay()
+    {
+        let xValue = 0
+        // let yValue = 10
+        if (favCoins.length === 0)
+    {
+        $("#chartContainer").hide()
+        $("#noCoinsToFollow").show()
+    }
+        else
+        {
+            $("#chartContainer").show()
+            $("#noCoinsToFollow").hide()
+            const today = new Date().getMinutes()
+            console.log(today)
+            let dataPoints = []
+            let options = {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Following CryptoCoins"
+                },
+                axisY: {
+                    title: "Units price",
+                    titleFontColor: "#4F81BC",
+                    lineColor: "#4F81BC",
+                    labelFontColor: "#4F81BC",
+                    tickColor: "#4F81BC"
+                },
+                toolTip: {
+                    shared: true
+                },
+                legend: {
+                    cursor: "pointer",
+                    itemclick: toggleDataSeries
+                },
+                data: []
+            }
+            for (let c = 0; c < favCoins.length; c++) {
+                if (favCoins.length === 1) {
+                    options.data.push(
+                        {
+                            type: "spline",
+                            name: favCoins[c].id,
+                            showInLegend: true,
+                            // xValueFormatString: "DD MMM YYYY",
+                            yValueFormatString: "#,##0 Units",
+                            dataPoints: [
+                                { x: today, y: getCoinRate(favCoins[c].symbol) }
+                            ]
+                        }
+                    )
+                    console.log(dataPoints)
+                }
+                else
+                {
+                    options.data.push(
+                    {
+                        type: "spline",
+                        name: favCoins[c].id,
+                        axisYType: "secondary",
+                        showInLegend: true,
+                        // xValueFormatString: "DD MMM YYYY",
+                        yValueFormatString: "$#,##0.#",
+                        dataPoints: [
+                            { x: today, y: getCoinRate(favCoins[c].symbol) }
+                        ]
+                    }
+                )
+                console.log(dataPoints)
+                }
+        function toggleDataSeries(e) {
+            if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false
+            } else {
+                e.dataSeries.visible = true
+            }
+            e.chart.render()
+        }
+        $("#chartContainer").CanvasJSChart(options)
+        addData()
+        // Initial Values
+        function addData() {
+           {
+            console.log(getCoinRate(favCoins[c]))
+                    dataPoints.push({ x: today, y: getCoinRate(favCoins[c]) })
+                    console.log(dataPoints)
+            }
+            $("#chartContainer").CanvasJSChart().render()
+        }
+    }}
+}})

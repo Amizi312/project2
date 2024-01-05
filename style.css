@@ -86,8 +86,8 @@ body {
 .popupContainer {
   position: absolute;
   cursor: pointer;
-  left: 0%;
-  width: 90%;
+  left: 10%;
+  width: 80%;
   user-select: none;
   flex-direction: column;
   flex-flow: wrap;
@@ -118,12 +118,17 @@ p {
   height: fit-content;
 }
 
+#myPopup p{
+  font-weight: 700;
+  font-size: larger;
+  font: bolder;
+}
 .popupContainer>.popupText {
   display: flex;
   visibility: hidden;
   left: 20%;
   height: 50%;
-  background-color: rgba(185, 185, 185, 1);
+  background-color: rgba(185, 185, 185, 0.9);
   color: #130a9b;
   text-align: center;
   border-radius: 10px;
@@ -165,4 +170,28 @@ p {
   to {
     opacity: 1;
   }
+}
+
+#aboutSection > p{
+  text-align: center;
+  color: #3e9c35;
+  position: fixed;
+  bottom: 0;
+  left: 40%; 
+}
+
+#chartContainer{
+  height: 100%;
+  width: 100%;
+}
+
+#noCoinsToFollow{
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  margin-top:30%;
+  color: red;
+  font-style: bold;
+  font-size: larger;
+  font-weight: 600;
 }
