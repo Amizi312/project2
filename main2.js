@@ -1,7 +1,9 @@
 /// <reference path="jquery-3.6.2.js" />
+
 const callAPI = "assets/cryptoAPI100.json" // "https://api.coingecko.com/api/v3/coins/"
 // const liveCoin = "https://min-api.cryptocompare.com/data/price?fsym="+coin.symbol+"&tsyms=USD"
 $(() => {
+    let cryptocurrencies = []
     let coins = []
     // Hide and show sections
     handleCoins()
@@ -89,7 +91,6 @@ $(() => {
                 return coins[i]
         }
     }
-
     // closing popup button
     $("#myPopup").on("click", "#closePopup", function () {
         const popup = document.getElementById("myPopup")
@@ -99,18 +100,17 @@ $(() => {
         popup.classList.toggle("show")
     }
     )
-    
     // scrolling with the popup
-    window.onscroll = function() {
+    $("#myPopup").on("scroll", function () {
         const box = document.getElementById("myPopup")
         let scroll = window.pageYOffset
-      
+
         if (scroll < 30) {
             box.style.top = "30px"
         } else {
             box.style.top = (scroll + 2) + "px"
         }
-      }
+    })
     // "Printing" coins to screen
     function displayCoins(displayArea, coins) {
         let card
@@ -211,104 +211,81 @@ $(() => {
         }
     }
     )
-    const updateInterval = setInterval(grpahDisplay, 3000)
-    async function getCoinRate(coin)
-            {
-                const resp = await fetch("https://min-api.cryptocompare.com/data/price?fsym="+coin+"&tsyms=USD")
-                const coinRate = await resp.json()
-                const answer = coinRate.USD
-                // console.log(answer)            
-                return (answer)
-            }
-    function grpahDisplay()
-    {
-        let xValue = 0
-        // let yValue = 10
-        if (favCoins.length === 0)
-    {
-        $("#chartContainer").hide()
-        $("#noCoinsToFollow").show()
-    }
-        else
-        {
-            $("#chartContainer").show()
+    //live chart
+    let chart = new CanvasJS.Chart("liveChartContainer", {
+        title: {
+            text: "Live Crypto Prices"
+        },
+        axisY: {
+            title: "Price (USD)"
+        },
+        axisX: {
+            valueFormatString: "HH:mm:ss"
+                },
+        data: [],   
+    })
+    $("#dataSection").on("click", function () {
+        if (favCoins.length === 0) {
+            $("#liveChartContainer").hide()
+            $("#noCoinsToFollow").show()
+                }
+        else {
+            $("#liveChartContainer").show()
             $("#noCoinsToFollow").hide()
-            const today = new Date().getMinutes()
-            console.log(today)
-            let dataPoints = []
-            let options = {
-                animationEnabled: true,
-                theme: "light2",
-                title: {
-                    text: "Following CryptoCoins"
-                },
-                axisY: {
-                    title: "Units price",
-                    titleFontColor: "#4F81BC",
-                    lineColor: "#4F81BC",
-                    labelFontColor: "#4F81BC",
-                    tickColor: "#4F81BC"
-                },
-                toolTip: {
-                    shared: true
-                },
-                legend: {
-                    cursor: "pointer",
-                    itemclick: toggleDataSeries
-                },
-                data: []
+            for(let i=0;i<favCoins.length;i++)
+            {
+                cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
+                console.log(cryptocurrencies)
             }
-            for (let c = 0; c < favCoins.length; c++) {
-                if (favCoins.length === 1) {
-                    options.data.push(
-                        {
-                            type: "spline",
-                            name: favCoins[c].id,
-                            showInLegend: true,
-                            // xValueFormatString: "DD MMM YYYY",
-                            yValueFormatString: "#,##0 Units",
-                            dataPoints: [
-                                { x: today, y: getCoinRate(favCoins[c].symbol) }
-                            ]
+    
+            for (let i = 0; i < cryptocurrencies.length; i++) {
+                chart.options.data.push({
+                    type: "line",
+                    showInLegend: true,
+                    name: cryptocurrencies[i],
+                    dataPoints: []
+                })
+            }
+
+            function updateChart() {
+                $.ajax({
+                    url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        for (let i = 0; i < cryptocurrencies.length; i++) {
+                            let cryptoPrice = data[cryptocurrencies[i]].USD
+                            chart.options.data[i].dataPoints.push({
+                                x: new Date(),
+                                y: cryptoPrice
+                            })
+                            if (chart.options.data[i].dataPoints.length > 20) {
+                                chart.options.data[i].dataPoints.shift()
+                            }
                         }
-                    )
-                    console.log(dataPoints)
-                }
-                else
-                {
-                    options.data.push(
-                    {
-                        type: "spline",
-                        name: favCoins[c].id,
-                        axisYType: "secondary",
-                        showInLegend: true,
-                        // xValueFormatString: "DD MMM YYYY",
-                        yValueFormatString: "$#,##0.#",
-                        dataPoints: [
-                            { x: today, y: getCoinRate(favCoins[c].symbol) }
-                        ]
+
+                        chart.render()
+                    },
+                    error: function (error) {
+                        console.log("Error fetching data: ", error)
                     }
-                )
-                console.log(dataPoints)
+                })
+            }
+
+            setInterval(updateChart, 2000)
+            updateChart()
+            
+            //reset cahrt
+            $("#home").on("click", function () {
+                for (let i = 0; i < cryptocurrencies.length; i++) {
+                    chart.options.data[i].dataPoints = []
                 }
-        function toggleDataSeries(e) {
-            if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                e.dataSeries.visible = false
-            } else {
-                e.dataSeries.visible = true
-            }
-            e.chart.render()
+                cryptocurrencies = []
+                chart.render()
+                clearInterval(updateChart)
+            })      
         }
-        $("#chartContainer").CanvasJSChart(options)
-        addData()
-        // Initial Values
-        function addData() {
-           {
-            console.log(getCoinRate(favCoins[c]))
-                    dataPoints.push({ x: today, y: getCoinRate(favCoins[c]) })
-                    console.log(dataPoints)
-            }
-            $("#chartContainer").CanvasJSChart().render()
-        }
-    }}
-}})
+    })
+    
+    
+}) 

@@ -171,25 +171,30 @@ p {
     opacity: 1;
   }
 }
-
+#aboutSection{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 #aboutSection > p{
   text-align: center;
   color: #3e9c35;
-  position: fixed;
-  bottom: 0;
-  left: 40%; 
 }
-
-#chartContainer{
-  height: 100%;
-  width: 100%;
+#amitech{
+  width: 30%;
+  height: 30%;
+}
+#liveChartContainer{
+  height: 80vh;
+  width: 100vw;
 }
 
 #noCoinsToFollow{
   height: 100%;
   width: 100%;
   text-align: center;
-  margin-top:30%;
+  margin-top:20%;
   color: red;
   font-style: bold;
   font-size: larger;

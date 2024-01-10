@@ -20,34 +20,47 @@
     </div>
     </div>
     <div id="sections">
-        <a href="javascript:void(0)" data-section="homeSection">Home</a>
-        <a href="javascript:void(0)" data-section="reportSection">Live Report</a>
+        <a href="javascript:void(0)" data-section="homeSection" id="home">Home</a>
+        <a href="javascript:void(0)" data-section="reportSection" id="dataSection">Live Report</a>
         <a href="javascript:void(0)" data-section="aboutSection">About Us</a>
         <div>
             <label>$earch Coin:</label>
             <input type="search" placeholder="btc, ethereum..." onload="reset()">
         </div>
     </div>
-    <div class="popupContainer" >
-        <div class="popupText" id="myPopup">
-            <button id="closePopup">X</button>
-            <p id="startText">You can choose up to 5 coins to follow:</p>
-            <div id="popupCoins"></div>
-            <p id="endText">please replace with another coin.</p>
-        </div>
-    </div>
+    <!-- <div class="d-flex justify-content-center">
+        <div class="spinner-border text-warning m-5" role="status">
+        <span class="sr-only"></span>
+      </div> 
+      </div>-->
     <div id="container">
-        <section id="homeSection"></section>
+        <section id="homeSection">
+            <div class="popupContainer">
+                <div class="popupText" id="myPopup">
+                    <button id="closePopup">X</button>
+                    <p id="startText">You can choose up to 5 coins to follow:</p>
+                    <div id="popupCoins"></div>
+                    <p id="endText">please replace with another coin.</p>
+                </div>
+            </div>
+        </section>
         <section id="reportSection">
             <div id="noCoinsToFollow">please choose at least one coin to follow to see its graph.</div>
-        <div id="chartContainer"></div></section>
-        <section id="aboutSection">
-            <p>
-                This site was built by amITech INC.
-                <br>
-                0508841559
-            </p>
-        </section>
+            <div id="liveChartContainer"></div>
+    </div>
+    </section>
+    <section id="aboutSection">
+        <p>
+            This site was build for studies project <br> at John Bryce college as part of FullStack course.
+        </p>
+        <img src="assets/amitech.jpg" id="amitech">
+        <hr>
+        <p>
+            This site was built by amITech - Amichai Mizrachi TEchnologies.
+            <br>
+            0508841559
+        </p>
+    </section>
     </div>
 </body>
 
