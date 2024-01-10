@@ -112,7 +112,7 @@ $(() => {
     // scrolling with the popup
     window.onscroll = function() {
         const box = document.getElementById("myPopup")
-        const loaderBox = document.getElementById("loader")
+        const loaderBox = document.getElementById("loaderBox")
         let scroll = window.pageYOffset
 
         if (scroll < 30) {
@@ -254,8 +254,9 @@ $(() => {
             $("#noCoinsToFollow").hide()
             for (let i = 0; i < favCoins.length; i++) {
                 cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
-                console.log(cryptocurrencies)
             }
+            console.log(favCoins)
+            console.log(cryptocurrencies)
 
             for (let i = 0; i < cryptocurrencies.length; i++) {
                 chart.options.data.push({
@@ -265,48 +266,55 @@ $(() => {
                     dataPoints: []
                 })
             }
-
-            function updateChart() {
-                $.ajax({
-                    url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
-                    type: "GET",
-                    dataType: "json",
-                    success: function (data) {
-                        $(".d-flex").css("visibility", "visible")
-                        $("#loader").show()
-                        for (let i = 0; i < cryptocurrencies.length; i++) {
-                            let cryptoPrice = data[cryptocurrencies[i]].USD
-                            chart.options.data[i].dataPoints.push({
-                                x: new Date(),
-                                y: cryptoPrice
-                            })
-                            if (chart.options.data[i].dataPoints.length > 20) {
-                                chart.options.data[i].dataPoints.shift()
-                            }
-                        }
-                        $("#loader").hide()
-                        $(".d-flex").css("visibility", "hidden")
-                        chart.render()
-                    },
-                    error: function (error) {
-                        console.log("Error fetching data: ", error)
-                    }
-                })
-            }
-
-            setInterval(updateChart, 2000)
-            updateChart()
-
-            //reset cahrt
-            $("#home").on("click", function () {
-                for (let i = 0; i < cryptocurrencies.length; i++) {
-                    chart.options.data[i].dataPoints = []
-                }
-                cryptocurrencies = []
-                chart.render()
-                clearInterval(updateChart)
-            })
         }
+    })
+    function updateChart() {
+        $.ajax({
+            url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                $(".d-flex").css("visibility", "visible")
+                $("#loader").show()
+                for (let i = 0; i < cryptocurrencies.length; i++) {
+                    let cryptoPrice = data[cryptocurrencies[i]].USD
+                    chart.options.data[i].dataPoints.push({
+                        x: new Date(),
+                        y: cryptoPrice
+                    })
+                    if (chart.options.data[i].dataPoints.length > 20) {
+                        chart.options.data[i].dataPoints.shift()
+                    }
+                }
+                $("#loader").hide()
+                $(".d-flex").css("visibility", "hidden")
+                chart.render()
+            },
+            error: function (error) {
+                console.log("Error fetching data: ", error)
+            }
+        })
+    }
+
+    setInterval(updateChart, 2000)
+    updateChart()
+
+    //reset chart
+    $("#home, #aboutUs").on("click", function () {
+        cryptocurrencies.length=0
+        chart = new CanvasJS.Chart("liveChartContainer", {
+            title: {
+                text: "Live Crypto Prices"
+            },
+            axisY: {
+                title: "Price (USD)"
+            },
+            axisX: {
+                valueFormatString: "HH:mm:ss"
+            },
+            data: [],
+        })
+            clearInterval(updateChart)
     })
 
 

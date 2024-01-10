@@ -1,7 +1,9 @@
 /// <reference path="jquery-3.6.2.js" />
+
 const callAPI = "assets/cryptoAPI100.json" // "https://api.coingecko.com/api/v3/coins/"
-// const liveCoin = `https://min-api.cryptocompare.com/data/price?fsym=${coin.symbol}&tsyms=USD`
+// const liveCoin = "https://min-api.cryptocompare.com/data/price?fsym="+coin.symbol+"&tsyms=USD"
 $(() => {
+    let cryptocurrencies = []
     let coins = []
     // Hide and show sections
     handleCoins()
@@ -17,8 +19,12 @@ $(() => {
     // getting coins' details and sending to display.
     async function handleCoins() {
         try {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             coins = await getJSON(callAPI)
             console.log(coins)
+            $(".d-flex").css("visibility", "hidden")
+            $("#loader").hide()
             displayCoins(("homeSection"), coins)
         }
         catch (error) {
@@ -28,9 +34,13 @@ $(() => {
     // Fetching coins from API
     function getJSON(url) {
         return new Promise((resolve, reject) => {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             $.ajax({
                 url,
                 success: data => {
+                    $(".d-flex").css("visibility", "hidden")
+                    $("#loader").hide()
                     resolve(data)
                 },
                 error: err => {
@@ -44,6 +54,7 @@ $(() => {
     let favCoins = []
     $("#homeSection").on("click", ".following", function () {
         const popup = document.getElementById("myPopup")
+        // console.log(popup)
         if (followingCoins <= 5) {
             if (this.textContent === `🙂`) { addFavCoin(this) }
             else if (this.textContent === `🤑`) { removeFavCoin(this) }
@@ -96,9 +107,22 @@ $(() => {
         document.getElementById(`follow${favCoins[favCoins.length - 1].id}`).textContent = `🙂`
         favCoins.pop()
         popup.classList.toggle("show")
-        console.log(favCoins)
     }
     )
+    // scrolling with the popup
+    window.onscroll = function() {
+        const box = document.getElementById("myPopup")
+        const loaderBox = document.getElementById("loaderBox")
+        let scroll = window.pageYOffset
+
+        if (scroll < 30) {
+            box.style.top = "30px"
+            loaderBox.style.top = "30px"
+        } else {
+            box.style.top = (scroll + 2) + "px" 
+            loaderBox.style.top = (scroll + 2) + "px"
+        }
+      }
     // "Printing" coins to screen
     function displayCoins(displayArea, coins) {
         let card
@@ -109,7 +133,7 @@ $(() => {
             else {
                 card = `<div class="card">
                     <span>${coin.id}</span><br>
-                    <img src="${coin.image.small}"/><br>
+                    <img src="${coin.image}"/><br>
                     </div>`
             }
             content += card
@@ -122,7 +146,7 @@ $(() => {
         <div class="card">
             <span>${coin.id}</span><br>
             <span>${coin.symbol}</span><br>
-            <img src="${coin.image.small}"/><br>
+            <img src="${coin.image}"/><br>
             <button class="showCoin btn btn-info" id="${coin.id}">More Info</button>
             <div class="coinInfo" id="${coin.id}Info"></div>
             <button class="following" id="follow${coin.id}">🙂</button>
@@ -154,7 +178,11 @@ $(() => {
         const coinId = $(this).attr("id")
         const infoDiv = document.getElementById(`${coinId}Info`)
         if (sessionStorage.getItem(`coinInfo${coinId}`) === null) {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             const coin = await getMoreInfo(coinId)
+            $(".d-flex").css("visibility", "hidden")
+            $("#loader").hide()
             const content = `
             ${coin.market_data.current_price.usd}$<br>
             ${coin.market_data.current_price.eur}€<br>
@@ -176,7 +204,11 @@ $(() => {
     )
     // fetching "more Info" data
     async function getMoreInfo(coinId) {
+        $(".d-flex").css("visibility", "visible")
+        $("#loader").show()
         const coin = await getJSON("https://api.coingecko.com/api/v3/coins/" + coinId)
+        $(".d-flex").css("visibility", "hidden")
+        $("#loader").hide()
         return coin
     }
     // Open and close "more Info"
@@ -199,8 +231,8 @@ $(() => {
         }
     }
     )
-       //live chart
-       let chart = new CanvasJS.Chart("liveChartContainer", {
+    //live chart
+    let chart = new CanvasJS.Chart("liveChartContainer", {
         title: {
             text: "Live Crypto Prices"
         },
@@ -222,8 +254,9 @@ $(() => {
             $("#noCoinsToFollow").hide()
             for (let i = 0; i < favCoins.length; i++) {
                 cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
-                console.log(cryptocurrencies)
             }
+            console.log(favCoins)
+            console.log(cryptocurrencies)
 
             for (let i = 0; i < cryptocurrencies.length; i++) {
                 chart.options.data.push({
@@ -233,48 +266,55 @@ $(() => {
                     dataPoints: []
                 })
             }
-
-            function updateChart() {
-                $.ajax({
-                    url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
-                    type: "GET",
-                    dataType: "json",
-                    success: function (data) {
-                        $(".d-flex").css("visibility", "visible")
-                        $("#loader").show()
-                        for (let i = 0; i < cryptocurrencies.length; i++) {
-                            let cryptoPrice = data[cryptocurrencies[i]].USD
-                            chart.options.data[i].dataPoints.push({
-                                x: new Date(),
-                                y: cryptoPrice
-                            })
-                            if (chart.options.data[i].dataPoints.length > 20) {
-                                chart.options.data[i].dataPoints.shift()
-                            }
-                        }
-                        $("#loader").hide()
-                        $(".d-flex").css("visibility", "hidden")
-                        chart.render()
-                    },
-                    error: function (error) {
-                        console.log("Error fetching data: ", error)
-                    }
-                })
-            }
-
-            setInterval(updateChart, 2000)
-            updateChart()
-
-            //reset cahrt
-            $("#home").on("click", function () {
-                for (let i = 0; i < cryptocurrencies.length; i++) {
-                    chart.options.data[i].dataPoints = []
-                }
-                cryptocurrencies = []
-                chart.render()
-                clearInterval(updateChart)
-            })
         }
+    })
+    function updateChart() {
+        $.ajax({
+            url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                $(".d-flex").css("visibility", "visible")
+                $("#loader").show()
+                for (let i = 0; i < cryptocurrencies.length; i++) {
+                    let cryptoPrice = data[cryptocurrencies[i]].USD
+                    chart.options.data[i].dataPoints.push({
+                        x: new Date(),
+                        y: cryptoPrice
+                    })
+                    if (chart.options.data[i].dataPoints.length > 20) {
+                        chart.options.data[i].dataPoints.shift()
+                    }
+                }
+                $("#loader").hide()
+                $(".d-flex").css("visibility", "hidden")
+                chart.render()
+            },
+            error: function (error) {
+                console.log("Error fetching data: ", error)
+            }
+        })
+    }
+
+    setInterval(updateChart, 2000)
+    updateChart()
+
+    //reset chart
+    $("#home, #aboutUs").on("click", function () {
+        cryptocurrencies.length=0
+        chart = new CanvasJS.Chart("liveChartContainer", {
+            title: {
+                text: "Live Crypto Prices"
+            },
+            axisY: {
+                title: "Price (USD)"
+            },
+            axisX: {
+                valueFormatString: "HH:mm:ss"
+            },
+            data: [],
+        })
+            clearInterval(updateChart)
     })
 
 
