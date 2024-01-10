@@ -19,8 +19,12 @@ $(() => {
     // getting coins' details and sending to display.
     async function handleCoins() {
         try {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             coins = await getJSON(callAPI)
             console.log(coins)
+            $(".d-flex").css("visibility", "hidden")
+            $("#loader").hide()
             displayCoins(("homeSection"), coins)
         }
         catch (error) {
@@ -30,9 +34,13 @@ $(() => {
     // Fetching coins from API
     function getJSON(url) {
         return new Promise((resolve, reject) => {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             $.ajax({
                 url,
                 success: data => {
+                    $(".d-flex").css("visibility", "hidden")
+                    $("#loader").hide()
                     resolve(data)
                 },
                 error: err => {
@@ -46,6 +54,7 @@ $(() => {
     let favCoins = []
     $("#homeSection").on("click", ".following", function () {
         const popup = document.getElementById("myPopup")
+        // console.log(popup)
         if (followingCoins <= 5) {
             if (this.textContent === `🙂`) { addFavCoin(this) }
             else if (this.textContent === `🤑`) { removeFavCoin(this) }
@@ -101,16 +110,19 @@ $(() => {
     }
     )
     // scrolling with the popup
-    $("#myPopup").on("scroll", function () {
+    window.onscroll = function() {
         const box = document.getElementById("myPopup")
+        const loaderBox = document.getElementById("loader")
         let scroll = window.pageYOffset
 
         if (scroll < 30) {
             box.style.top = "30px"
+            loaderBox.style.top = "30px"
         } else {
-            box.style.top = (scroll + 2) + "px"
+            box.style.top = (scroll + 2) + "px" 
+            loaderBox.style.top = (scroll + 2) + "px"
         }
-    })
+      }
     // "Printing" coins to screen
     function displayCoins(displayArea, coins) {
         let card
@@ -166,7 +178,11 @@ $(() => {
         const coinId = $(this).attr("id")
         const infoDiv = document.getElementById(`${coinId}Info`)
         if (sessionStorage.getItem(`coinInfo${coinId}`) === null) {
+            $(".d-flex").css("visibility", "visible")
+            $("#loader").show()
             const coin = await getMoreInfo(coinId)
+            $(".d-flex").css("visibility", "hidden")
+            $("#loader").hide()
             const content = `
             ${coin.market_data.current_price.usd}$<br>
             ${coin.market_data.current_price.eur}€<br>
@@ -188,7 +204,11 @@ $(() => {
     )
     // fetching "more Info" data
     async function getMoreInfo(coinId) {
+        $(".d-flex").css("visibility", "visible")
+        $("#loader").show()
         const coin = await getJSON("https://api.coingecko.com/api/v3/coins/" + coinId)
+        $(".d-flex").css("visibility", "hidden")
+        $("#loader").hide()
         return coin
     }
     // Open and close "more Info"
@@ -221,23 +241,22 @@ $(() => {
         },
         axisX: {
             valueFormatString: "HH:mm:ss"
-                },
-        data: [],   
+        },
+        data: [],
     })
     $("#dataSection").on("click", function () {
         if (favCoins.length === 0) {
             $("#liveChartContainer").hide()
             $("#noCoinsToFollow").show()
-                }
+        }
         else {
             $("#liveChartContainer").show()
             $("#noCoinsToFollow").hide()
-            for(let i=0;i<favCoins.length;i++)
-            {
+            for (let i = 0; i < favCoins.length; i++) {
                 cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
                 console.log(cryptocurrencies)
             }
-    
+
             for (let i = 0; i < cryptocurrencies.length; i++) {
                 chart.options.data.push({
                     type: "line",
@@ -253,6 +272,8 @@ $(() => {
                     type: "GET",
                     dataType: "json",
                     success: function (data) {
+                        $(".d-flex").css("visibility", "visible")
+                        $("#loader").show()
                         for (let i = 0; i < cryptocurrencies.length; i++) {
                             let cryptoPrice = data[cryptocurrencies[i]].USD
                             chart.options.data[i].dataPoints.push({
@@ -263,7 +284,8 @@ $(() => {
                                 chart.options.data[i].dataPoints.shift()
                             }
                         }
-
+                        $("#loader").hide()
+                        $(".d-flex").css("visibility", "hidden")
                         chart.render()
                     },
                     error: function (error) {
@@ -274,7 +296,7 @@ $(() => {
 
             setInterval(updateChart, 2000)
             updateChart()
-            
+
             //reset cahrt
             $("#home").on("click", function () {
                 for (let i = 0; i < cryptocurrencies.length; i++) {
@@ -283,9 +305,9 @@ $(() => {
                 cryptocurrencies = []
                 chart.render()
                 clearInterval(updateChart)
-            })      
+            })
         }
     })
-    
-    
+
+
 }) 

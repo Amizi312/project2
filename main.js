@@ -199,104 +199,83 @@ $(() => {
         }
     }
     )
-    const updateInterval = setInterval(grpahDisplay, 1000)
-    function grpahDisplay()
-    {
-        if (favCoins.length === 0)
-    {
-        $("#chartContainer").hide()
-        $("#noCoinsToFollow").show()
-    }
-        else
-        {
-            $("#chartContainer").show()
+       //live chart
+       let chart = new CanvasJS.Chart("liveChartContainer", {
+        title: {
+            text: "Live Crypto Prices"
+        },
+        axisY: {
+            title: "Price (USD)"
+        },
+        axisX: {
+            valueFormatString: "HH:mm:ss"
+        },
+        data: [],
+    })
+    $("#dataSection").on("click", function () {
+        if (favCoins.length === 0) {
+            $("#liveChartContainer").hide()
+            $("#noCoinsToFollow").show()
+        }
+        else {
+            $("#liveChartContainer").show()
             $("#noCoinsToFollow").hide()
-            // const today = new Date().getMinutes
-            let dataPoints = []
-            let options = {
-                animationEnabled: true,
-                theme: "light2",
-                title: {
-                    text: "Following CryptoCoins"
-                },
-                axisY: {
-                    title: "Units price",
-                    titleFontColor: "#4F81BC",
-                    lineColor: "#4F81BC",
-                    labelFontColor: "#4F81BC",
-                    tickColor: "#4F81BC"
-                },
-                toolTip: {
-                    shared: true
-                },
-                legend: {
-                    cursor: "pointer",
-                    itemclick: toggleDataSeries
-                },
-                data: []
+            for (let i = 0; i < favCoins.length; i++) {
+                cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
+                console.log(cryptocurrencies)
             }
-            for (let c = 0; c < favCoins.length; c++) {
-                if (favCoins.length === 1) {
-                    options.data.push(
-                        {
-                            type: "spline",
-                            name: favCoins[c].id,
-                            showInLegend: true,
-                            xValueFormatString: "DD MMM YYYY",
-                            yValueFormatString: "#,##0 Units",
-                            dataPoints: [
-                                { x: 0, y: 60 }
-                            ]
-                        }
-                    )
-                }
-                options.data.push(
-                    {
-                        type: "spline",
-                        name: favCoins[c].id,
-                        axisYType: "secondary",
-                        showInLegend: true,
-                        xValueFormatString: "DD MMM YYYY",
-                        yValueFormatString: "$#,##0.#",
-                        dataPoints: [
-                            { x: 0, y: 100*c }
-                        ]
-                    },
-                )
-            }
-        function toggleDataSeries(e) {
-            if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                e.dataSeries.visible = false
-            } else {
-                e.dataSeries.visible = true
-            }
-            e.chart.render()
-        }
-        $("#chartContainer").CanvasJSChart(options)
-        updateData()
-        // Initial Values
-        var xValue = 0
-        var yValue = 10
-        var newDataCount = 6
-        function addData(data) {
-            if (newDataCount != 1) {
-                $.each(data, function (key, value) {
-                    dataPoints.push({ x: value[0], y: parseInt(value[1]) })
-                    xValue++
-                    yValue = parseInt(value[1])
+
+            for (let i = 0; i < cryptocurrencies.length; i++) {
+                chart.options.data.push({
+                    type: "line",
+                    showInLegend: true,
+                    name: cryptocurrencies[i],
+                    dataPoints: []
                 })
-            } else {
-                //dataPoints.shift();
-                dataPoints.push({ x: data[0][0], y: parseInt(data[0][1]) })
-                xValue++
-                yValue = parseInt(data[0][1])
             }
-            newDataCount = 1
-            $("#chartContainer").CanvasJSChart().render()
-            setTimeout(updateData, 1500);
+
+            function updateChart() {
+                $.ajax({
+                    url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=" + cryptocurrencies.join() + "&tsyms=USD",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        $(".d-flex").css("visibility", "visible")
+                        $("#loader").show()
+                        for (let i = 0; i < cryptocurrencies.length; i++) {
+                            let cryptoPrice = data[cryptocurrencies[i]].USD
+                            chart.options.data[i].dataPoints.push({
+                                x: new Date(),
+                                y: cryptoPrice
+                            })
+                            if (chart.options.data[i].dataPoints.length > 20) {
+                                chart.options.data[i].dataPoints.shift()
+                            }
+                        }
+                        $("#loader").hide()
+                        $(".d-flex").css("visibility", "hidden")
+                        chart.render()
+                    },
+                    error: function (error) {
+                        console.log("Error fetching data: ", error)
+                    }
+                })
+            }
+
+            setInterval(updateChart, 2000)
+            updateChart()
+
+            //reset cahrt
+            $("#home").on("click", function () {
+                for (let i = 0; i < cryptocurrencies.length; i++) {
+                    chart.options.data[i].dataPoints = []
+                }
+                cryptocurrencies = []
+                chart.render()
+                clearInterval(updateChart)
+            })
         }
-        function updateData() {
-            $.getJSON("https://canvasjs.com/services/data/datapoints.php?xstart=" + xValue + "&ystart=" + yValue + "&length=" + newDataCount + "&type=json", addData)
-        }
-    }
-}})
+    })
+
+
+}) 
