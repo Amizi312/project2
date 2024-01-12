@@ -255,8 +255,6 @@ $(() => {
             for (let i = 0; i < favCoins.length; i++) {
                 cryptocurrencies.push((favCoins[i].symbol).toUpperCase())
             }
-            console.log(favCoins)
-            console.log(cryptocurrencies)
 
             for (let i = 0; i < cryptocurrencies.length; i++) {
                 chart.options.data.push({
@@ -316,6 +314,17 @@ $(() => {
         })
             clearInterval(updateChart)
     })
-
+    //scroll to top button
+    window.onscroll = function() {scrollFunction()}
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        $("#backTop").css("display","block")
+      } else {
+        $("#backTop").css("display","none")  
+        }
+    }
+    $("#backTop").on("click", function() {
+      document.documentElement.scrollTop = 0
+    } )
 
 }) 

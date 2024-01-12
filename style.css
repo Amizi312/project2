@@ -6,6 +6,18 @@
   background-color: rgba(9, 169, 223, 0.2);
 }
 
+#backTop
+{
+  display: none;
+  height: 75ox;
+  width: 75px;
+  border-radius: 50%;
+  position: fixed;
+  right: 5px;
+  bottom: 5px;
+  z-index: 1;
+  background-color: rgba(62,156,53,0.7);
+}
 #homeSection {
   display: inline-flex;
   flex-direction: row;
@@ -100,9 +112,11 @@ body {
   flex-wrap: wrap;
   flex-grow: 20%;
   justify-content: center;
+  cursor: pointer;
 }
 
 #myPopup {
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -121,8 +135,10 @@ p {
   font-weight: 700;
   font-size: larger;
   font: bolder;
+  cursor: pointer;
 }
 .popupContainer>.popupText {
+  cursor: pointer;
   display: flex;
   visibility: hidden;
   left: 20%;
@@ -138,6 +154,7 @@ p {
 }
 
 .popupText {
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   justify-content: center;
