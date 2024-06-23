@@ -1,8 +1,8 @@
 /// <reference path="jquery-3.6.2.js" />
 
 const callAPI = "assets/cryptoAPI100.json" // "https://api.coingecko.com/api/v3/coins/"
-// const liveCoin = "https://min-api.cryptocompare.com/data/price?fsym="+coin.symbol+"&tsyms=USD"
 $(() => {
+    
     let cryptocurrencies = []
     let coins = []
     // Hide and show sections
